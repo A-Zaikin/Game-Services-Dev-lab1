@@ -1,7 +1,7 @@
 # АНАЛИЗ ДАННЫХ И ИСКУССТВЕННЫЙ ИНТЕЛЛЕКТ [in GameDev]
-Отчет по лабораторной работе #1 выполнил(а):
-- Иванова Ивана Варкравтовна
-- РИ000024
+Отчет по лабораторной работе #1 выполнил:
+- Заикин Александр Юрьевич
+- РИ300012
 Отметка о выполнении заданий (заполняется студентом):
 
 | Задание | Выполнение | Баллы |
@@ -35,104 +35,115 @@
 - ✨Magic ✨
 
 ## Цель работы
-Ознакомиться с основными операторами зыка Python на примере реализации линейной регрессии.
+Ознакомиться с основными функциями Unity и взаимодействием с объектами внутри редактора.
 
 ## Задание 1
-### Пошагово выполнить каждый пункт раздела "ход работы" с описанием и примерами реализации задач
+### В разделе «ход работы» пошагово выполнить каждый пункт с описанием и примером реализации задач по теме видео самостоятельной работы
 Ход работы:
-- Произвести подготовку данных для работы с алгоритмом линейной регрессии. 10 видов данных были установлены случайным образом, и данные находились в линейной зависимости. Данные преобразуются в формат массива, чтобы их можно было вычислить напрямую при использовании умножения и сложения.
+1)	Создать новый проект из шаблона 3D – Core;
+2)	Проверить, что настроена интеграция редактора Unity и Visual Studio Code (пункты 8-10 введения);
+3)	Создать объект Plane;
+4)	Создать объект Cube;
+5)	Создать объект Sphere;
+![Screenshot 1](Screenshots/1.png)
+6)	Установить компонент Sphere Collider для объекта Sphere;
+7)	Настроить Sphere Collider в роли триггера;
+![Screenshot 2](Screenshots/2.png)
+8)	Объект куб перекрасить в красный цвет;
+9)	Добавить кубу симуляцию физики, при это куб не должен проваливаться под Plane;
+![Screenshot 3](Screenshots/3.png)
+10) Написать скрипт, который будет выводить в консоль сообщение о том, что объект Sphere столкнулся с объектом Cube;
+11) При столкновении Cube должен менять свой цвет на зелёный, а при завершении столкновения обратно на красный.
+```cs
+public class CheckCollider : MonoBehaviour
+{
+    private void OnTriggerEnter(Collider other)
+    {
+        Debug.Log($"Sphere has collided with {other.name}");
+        if (other.TryGetComponent<Renderer>(out var renderer))
+        {
+            renderer.material.SetColor("_Color", Color.green);
+        }
+    }
 
-```py
-
-In [ ]:
-#Import the required modules, numpy for calculation, and Matplotlib for drawing
-import numpy as np
-import matplotlib.pyplot as plt
-#This code is for jupyter Notebook only
-%matplotlib inline
-
-# define data, and change list to array
-x = [3,21,22,34,54,34,55,67,89,99]
-x = np.array(x)
-y = [2,22,24,65,79,82,55,130,150,199]
-y = np.array(y)
-
-#Show the effect of a scatter plot
-plt.scatter(x,y)
-
+    private void OnTriggerExit(Collider other)
+    {
+        if (other.TryGetComponent<Renderer>(out var renderer))
+        {
+            renderer.material.SetColor("_Color", Color.red);
+        }
+    }
+}
 ```
+![Screenshot 4](Screenshots/4.png)
+![Screenshot 5](Screenshots/5.png)
 
-- Определите связанные функции. Функция модели: определяет модель линейной регрессии wx+b. Функция потерь: функция потерь среднеквадратичной ошибки. Функция оптимизации: метод градиентного спуска для нахождения частных производных w и b.
 
 
 ## Задание 2
-### Должна ли величина loss стремиться к нулю при изменении исходных данных? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ.
+### Продемонстрируйте на сцене в Unity следующее:
+### - Что произойдёт с координатами объекта, если он перестанет быть дочерним?
 
-- Перечисленные в этом туториале действия могут быть выполнены запуском на исполнение скрипт-файла, доступного [в репозитории](https://github.com/Den1sovDm1triy/hfss-scripting/blob/main/ScreatingSphereInAEDT.py).
-- Для запуска скрипт-файла откройте Ansys Electronics Desktop. Перейдите во вкладку [Automation] - [Run Script] - [Выберите файл с именем ScreatingSphereInAEDT.py из репозитория].
+Сфера - потомок капсулы, двигается вместе с ней. (на самом деле повторяет любое изменение трансформа)
 
-```py
+![Screenshot 6](Screenshots/6.gif)
 
-import ScriptEnv
-ScriptEnv.Initialize("Ansoft.ElectronicsDesktop")
-oDesktop.RestoreWindow()
-oProject = oDesktop.NewProject()
-oProject.Rename("C:/Users/denisov.dv/Documents/Ansoft/SphereDIffraction.aedt", True)
-oProject.InsertDesign("HFSS", "HFSSDesign1", "HFSS Terminal Network", "")
-oDesign = oProject.SetActiveDesign("HFSSDesign1")
-oEditor = oDesign.SetActiveEditor("3D Modeler")
-oEditor.CreateSphere(
-	[
-		"NAME:SphereParameters",
-		"XCenter:="		, "0mm",
-		"YCenter:="		, "0mm",
-		"ZCenter:="		, "0mm",
-		"Radius:="		, "1.0770329614269mm"
-	], 
-)
+Сфера перестала быть дочерним объектом, теперь она не двигается при движении капсулы.
 
+![Screenshot 7](Screenshots/7.gif)
+
+### - Создайте три различных примера работы компонента RigidBody?
+
+![Screenshot 8](Screenshots/8.gif)
+
+1) Капсула; Режим Kinematic - RigidBody управляется напрямую из пользовательских скриптов. Оно служит препятствием для Dynamic RigidBody.
+
+2) Куб; Режим Dynamic - RigidBody двигается по законам физики, сталкивается с другими объектами, находится под действием гравитации (опционально).
+
+3) Цилиндр; RigidBody находится под действием Constraints по позиции (не может двигатся). В скрипте ему передаётся крутящий момент.
+
+```cs
+private void Start()
+{
+    var rigidbody = GetComponent<Rigidbody>();
+    rigidbody.AddRelativeTorque(Vector3.forward * speed);
+}
 ```
 
 ## Задание 3
-### Какова роль параметра Lr? Ответьте на вопрос, приведите пример выполнения кода, который подтверждает ваш ответ. В качестве эксперимента можете изменить значение параметра.
+### Реализуйте на сцене генерацию n кубиков. Число n вводится пользователем после старта сцены.
 
-- Перечисленные в этом туториале действия могут быть выполнены запуском на исполнение скрипт-файла, доступного [в репозитории](https://github.com/Den1sovDm1triy/hfss-scripting/blob/main/ScreatingSphereInAEDT.py).
-- Для запуска скрипт-файла откройте Ansys Electronics Desktop. Перейдите во вкладку [Automation] - [Run Script] - [Выберите файл с именем ScreatingSphereInAEDT.py из репозитория].
+![Screenshot 9](Screenshots/9.gif)
 
-```py
 
-import ScriptEnv
-ScriptEnv.Initialize("Ansoft.ElectronicsDesktop")
-oDesktop.RestoreWindow()
-oProject = oDesktop.NewProject()
-oProject.Rename("C:/Users/denisov.dv/Documents/Ansoft/SphereDIffraction.aedt", True)
-oProject.InsertDesign("HFSS", "HFSSDesign1", "HFSS Terminal Network", "")
-oDesign = oProject.SetActiveDesign("HFSSDesign1")
-oEditor = oDesign.SetActiveEditor("3D Modeler")
-oEditor.CreateSphere(
-	[
-		"NAME:SphereParameters",
-		"XCenter:="		, "0mm",
-		"YCenter:="		, "0mm",
-		"ZCenter:="		, "0mm",
-		"Radius:="		, "1.0770329614269mm"
-	], 
-)
+1) Создан пустой объект CubeSpawner и к нему прикреплён компонент:
 
+```cs
+public class CubeSpawner : MonoBehaviour
+{
+    [SerializeField] private TMP_InputField inputField;
+    [SerializeField] private GameObject cubePrefab;
+    [SerializeField] private float cubeSpawnDistance;
+
+    private void Start()
+    {
+        inputField.onEndEdit.AddListener((text) =>
+        {
+            var cubeCount = int.Parse(text);
+            for (var i = 0; i < cubeCount; i++)
+            {
+                Instantiate(cubePrefab, cubeSpawnDistance * i * Vector3.up, new Quaternion());
+            }
+        });
+    }
+}
 ```
+2) Создан префаб куба, ему изменён цвет на красный и добавлен компонент RigidBody. Ссылка на него добавлена в CubeSpawner.
+3) Созданы объекты Canvas и дочерний InputField. InputField помещён в центр экрана и ссылка на него добавлена в CubeSpawner.
 
 ## Выводы
 
-Абзац умных слов о том, что было сделано и что было узнано.
-
-| Plugin | README |
-| ------ | ------ |
-| Dropbox | [plugins/dropbox/README.md][PlDb] |
-| GitHub | [plugins/github/README.md][PlGh] |
-| Google Drive | [plugins/googledrive/README.md][PlGd] |
-| OneDrive | [plugins/onedrive/README.md][PlOd] |
-| Medium | [plugins/medium/README.md][PlMe] |
-| Google Analytics | [plugins/googleanalytics/README.md][PlGa] |
+Ознакомился с основными функциями Unity и взаимодействием с объектами внутри редактора. Ознакомился с правилами оформления отчёта.
 
 ## Powered by
 
